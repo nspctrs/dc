@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DC — Rare Username Hunter</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:900px;margin:40px auto;padding:0 20px;background:#0d1117;color:#e6edf3}button,select,input{font:inherit;padding:10px;border-radius:8px;border:1px solid #30363d;background:#161b22;color:inherit}button{cursor:pointer;background:#238636;border:0;font-weight:700}.bar{display:flex;gap:10px;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:20px}.card{padding:14px;border:1px solid #30363d;border-radius:10px;background:#161b22}.name{font-size:24px;font-weight:800}.score{font-size:12px;color:#8b949e}.hint{color:#8b949e}
+</style></head>
+<body>
+<h1>DC</h1><p class="hint">Rare Username Hunter — gera candidatos curtos alfanuméricos.</p>
+<div class="bar"><label>Até <select id="len"><option>1</option><option>2</option><option selected>3</option></select> caracteres</label><label>Quantidade <input id="limit" type="number" min="1" max="5000" value="100"></label><button onclick="hunt()">CAÇAR</button></div>
+<div id="status" class="hint"></div><div id="results" class="grid"></div>
+<script>
+const alphabet='abcdefghijklmnopqrstuvwxyz0123456789';
+function score(s){let x=100-s.length*15;if(new Set(s).size===s.length)x+=8;if(/[0-9]/.test(s))x+=3;if(/^\d/.test(s))x+=2;if(s.length===3&&/\d/.test(s[1]))x+=4;return x}
+function* names(max){for(let n=1;n<=max;n++){const idx=Array(n).fill(0);while(true){yield idx.map(i=>alphabet[i]).join('');let p=n-1;while(p>=0&&idx[p]===alphabet.length-1){idx[p]=0;p--}if(p<0)break;idx[p]++}}}
+function hunt(){const max=+document.querySelector('#len').value,limit=+document.querySelector('#limit').value;const out=[];for(const name of names(max)){out.push({name,score:score(name)});if(out.length>=limit)break}out.sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name));document.querySelector('#results').innerHTML=out.map(x=>`<div class="card"><div class="name">${x.name}</div><div class="score">score ${x.score}</div></div>`).join('');document.querySelector('#status').textContent=`${out.length} candidatos gerados. Score é uma heurística; não confirma disponibilidade no Discord.`}
+hunt();
+</script></body></html>
